@@ -1,11 +1,19 @@
 
 services:
-
- db: 
-  image: mysql
-  restart: always 
-  port: 3306:3306
-  environment:
-    MYSQL_ROOT_PASSWORD: ROOT
+  db: 
+    image: mysql
+    restart: always 
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ROOT
+  php:
+    build:
+      context: .
+      dockerfile: dockerfile 
+    ports:
+      - "8080:80"
+    depends_on:
+        - db
 
 
