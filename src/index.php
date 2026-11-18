@@ -18,7 +18,7 @@ $resultado = mysqli_query($conn, $sql);
 
 
 
-// while ($cliente )  {
+// while ($cliente) {
 //     echo $cliente['nombre'] . " - ";
 //     echo $cliente['correo'] . "<br>";
 // }
@@ -52,6 +52,8 @@ $resultado = mysqli_query($conn, $sql);
             <th>Apellido</th>
             <th>Correo</th>
             <th>Teléfono</th>
+            <th>Dirección</th>
+            <th>Ciudad</th>
         </tr>
 
         <?php
@@ -61,11 +63,14 @@ $resultado = mysqli_query($conn, $sql);
             <tr>
 
 
-                <td><?php echo htmlspecialchars($cliente['id'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars($cliente['nombre'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars($cliente['apellido'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars($cliente['correo'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars($cliente['telefono'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($cliente['Id'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($cliente['Nombre'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($cliente['Apellido'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($cliente['Correo'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($cliente['Telefono'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($cliente['Direccion'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($cliente['Ciudad'] ?? ''); ?></td>
+
 
             </tr>
 
