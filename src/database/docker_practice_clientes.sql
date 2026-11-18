@@ -39,7 +39,7 @@ DROP TABLE IF EXISTS `clientes`;
 ;
 CREATE TABLE `clientes` (
     `Id` int NOT NULL AUTO_INCREMENT,
-    `nombre` varchar(50),
+    `Nombre` varchar(50),
     `Apellido` varchar(50),
     `Correo` varchar(100),
     `Telefono` varchar(30),
@@ -102,7 +102,7 @@ VALUES (
         'pedro@gmail.com',
         '8095551238',
         'Calle Principal 5',
-        'La Vega'
+        'Santo Domingo'
     ),
     (
         6,
