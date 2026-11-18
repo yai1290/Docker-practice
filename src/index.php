@@ -40,33 +40,34 @@ $resultado = mysqli_query($conn, $sql);
 
     <h1>Listado de clientes</h1>
 
-    <p>Total de clientes: 
-        <?php echo mysqli_num_rows($resultado); ?></p>
+    <p>Total de clientes:
+        <?php echo mysqli_num_rows($resultado); ?>
+    </p>
 
 
     <table border="1" cellpadding="10">
         <tr>
             <th>ID</th>
-            <th>Nombre</th> 
-          <th>Apellido</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
             <th>Correo</th>
             <th>Teléfono</th>
         </tr>
 
-           <?php
+        <?php
         while ($cliente = mysqli_fetch_assoc($resultado)) {
-        ?>
+            ?>
 
-        <tr>
-    
+            <tr>
 
-      <td><?php echo htmlspecialchars($cliente['id'] ); ?></td>
-        <td><?php echo htmlspecialchars($cliente['nombre']); ?></td>
-        <td><?php echo htmlspecialchars($cliente['apellido']); ?></td>
-        <td><?php echo htmlspecialchars($cliente['correo']); ?></td>
-        <td><?php echo htmlspecialchars($cliente['telefono'] ?? ''); ?></td>
-            
-        </tr>
+
+                <td><?php echo htmlspecialchars($cliente['id'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($cliente['nombre'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($cliente['apellido'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($cliente['correo'] ?? ''); ?></td>
+                <td><?php echo htmlspecialchars($cliente['telefono'] ?? ''); ?></td>
+
+            </tr>
 
 
         <?php } ?>
