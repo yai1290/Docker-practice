@@ -1,10 +1,17 @@
 <?php
+
 $servidor = "db";
 $usuario = "root";
 $contrasena = "ROOT";
 $base_datos = "docker_practice";
 
 $conn = mysqli_connect($servidor, $usuario, $contrasena, $base_datos);
+
+if (!$conn) {
+    die("Error de conexión: " . mysqli_connect_error());
+}
+
+mysqli_set_charset($conn, "utf8mb4");
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -15,38 +22,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $direccion = $_POST['Direccion'];
     $ciudad = $_POST['Ciudad'];
 
-
-}
-
-
-if (!$conn) {
-    die("Error de conexión: " . mysqli_connect_error());
-}
-
-
-$sql = "INSERT INTO clientes (Nombre, Apellido, Correo, Telefono, Direccion, Ciudad) 
+     $sql = "INSERT INTO clientes
+        (Nombre, Apellido, Correo, Telefono, Direccion, Ciudad) 
         VALUES (?, ?, ?, ?, ?, ?)";
 
-        $stmt = mysqli_prepare($conn, $sql);
-
-        $stmt->bind_param("ssssss", $nombre, $apellido, $correo, $telefono, $direccion, $ciudad);
         
-        mysqli_stmt_bind_param($stmt, "ssssss", $nombre, $apellido, $correo, $telefono, $direccion, $ciudad);
+    $stmt = mysqli_prepare($conn, $sql);
 
-        
-        if (mysqli_stmt_execute($stmt)){
-            echo "Cliente registrado exitosamente.";
-        } else {
-            echo "Error al registrar cliente:" . mysqli_error($stmt);
-        }
+    if (!$stmt) {
+        die("Error al preparar la consulta: " . mysqli_error($conn));
+    }
+
+    mysqli_stmt_bind_param($stmt,"ssssss",
+        $nombre,
+        $apellido,
+        $correo,
+        $telefono,
+        $direccion,
+        $ciudad
+    
+    );
+
+      if (mysqli_stmt_execute($stmt)) {
+
+        echo "Cliente registrado exitosamente.";
+
+    } else {
+
+        echo "Error al registrar cliente: " . mysqli_stmt_error($stmt);
+
+    }
+
+    mysqli_stmt_close($stmt);
+
+
+}
+
+mysqli_close($conn);
+
+
+
+
 
 ?>
-
-
-
-
-
-
 
 
 
@@ -62,9 +80,9 @@ $sql = "INSERT INTO clientes (Nombre, Apellido, Correo, Telefono, Direccion, Ciu
 
     <h1>Registrar Clientes</h1>
 
-</body>
 
-<form action="crear.php" method="POST">
+
+    <form action="crear.php" method="POST">
 
     <label>Nombre:</label>
     <input type="text" name="Nombre" required>
@@ -98,6 +116,8 @@ $sql = "INSERT INTO clientes (Nombre, Apellido, Correo, Telefono, Direccion, Ciu
 
     <button type="submit">Registrar</button>
 
-</form>
+    </form>
+    
+</body>
 
 </html>

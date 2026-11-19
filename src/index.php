@@ -54,6 +54,8 @@ $resultado = mysqli_query($conn, $sql);
             <th>Teléfono</th>
             <th>Dirección</th>
             <th>Ciudad</th>
+            <th>Acciones</th>
+        
         </tr>
 
         <?php
@@ -70,6 +72,12 @@ $resultado = mysqli_query($conn, $sql);
                 <td><?php echo htmlspecialchars($cliente['Telefono'] ?? ''); ?></td>
                 <td><?php echo htmlspecialchars($cliente['Direccion'] ?? ''); ?></td>
                 <td><?php echo htmlspecialchars($cliente['Ciudad'] ?? ''); ?></td>
+                
+            <td>
+                <a href="editar.php?id=<?php echo $cliente['Id']; ?>">
+                    Editar
+                </a>
+            </td>
 
 
             </tr>
