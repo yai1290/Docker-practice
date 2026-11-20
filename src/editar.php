@@ -1,4 +1,9 @@
 <?php
+
+// ==========================================
+// 1. CONEXIÓN A LA BASE DE DATOS
+// ==========================================
+
 $servidor = "db";
 $usuario = "root";
 $contrasena = "ROOT";
@@ -13,34 +18,125 @@ if (!$conn) {
 mysqli_set_charset($conn, "utf8mb4");
 
 
-$id = $_GET['id'];
+// ==========================================
+// 2. IDENTIFICAR EL MÉTODO HTTP
+// ==========================================
 
-echo "El ID del cliente es: " . $id;
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-$sql = "select * from clientes where Id = ?";
+    // ======================================
+    // 3. RECUPERAR LOS DATOS DEL FORMULARIO
+    // ======================================
 
-$stmt = mysqli_prepare($conn, $sql);
+    $id = $_POST['Id'];
 
-mysqli_stmt_bind_param($stmt,"i", $id,  
+    $nombre = $_POST['Nombre'];
+    $apellido = $_POST['Apellido'];
+    $correo = $_POST['Correo'];
+    $telefono = $_POST['Telefono'];
+    $direccion = $_POST['Direccion'];
+    $ciudad = $_POST['Ciudad'];
+
+
+    // ======================================
+    // 4. PREPARAR LA CONSULTA UPDATE
+    // ======================================
+
+    $sql = "UPDATE clientes
+            SET Nombre = ?, Apellido = ?, Correo = ?,
+                Telefono = ?, Direccion = ?, Ciudad = ?
+            WHERE Id = ?";
+
+    $stmt = mysqli_prepare($conn, $sql);
+
+    if (!$stmt) {
+        die("Error al preparar la consulta: " . mysqli_error($conn));
+    }
+
+
+    // ======================================
+    // 5. VINCULAR LOS DATOS
+    // ======================================
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        "ssssssi",
+        $nombre,
+        $apellido,
+        $correo,
+        $telefono,
+        $direccion,
+        $ciudad,
+        $id
     );
+
+
+    // ======================================
+    // 6. EJECUTAR LA ACTUALIZACIÓN
+    // ======================================
+
+    if (mysqli_stmt_execute($stmt)) {
+
+        mysqli_stmt_close($stmt);
+        mysqli_close($conn);
+
+        header("Location: editar.php?id=" . $id);
+        exit;
+
+    } else {
+
+        die("Error al actualizar: " . mysqli_stmt_error($stmt));
+
+    }
+
+    mysqli_stmt_close($stmt);
+
+
+} else {
+
+    // ======================================
+    // 7. RECUPERAR EL ID MEDIANTE GET
+    // ======================================
+
+    if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+        die("ID de cliente no válido.");
+    }
+
+    $id = (int) $_GET['id'];
+
+
+    // ======================================
+    // 8. CONSULTAR EL CLIENTE
+    // ======================================
+
+    $sql = "SELECT * FROM clientes WHERE Id = ?";
+
+    $stmt = mysqli_prepare($conn, $sql);
+
+    mysqli_stmt_bind_param($stmt, "i", $id);
+
     mysqli_stmt_execute($stmt);
 
-$resultado = mysqli_stmt_get_result($stmt);
+    $resultado = mysqli_stmt_get_result($stmt);
 
 
-if (!$resultado) {
-    die("Error al obtener resultado: " . mysqli_stmt_error($stmt));
+    // ======================================
+    // 9. RECUPERAR EL REGISTRO
+    // ======================================
+
+    $cliente = mysqli_fetch_assoc($resultado);
+
+    if (!$cliente) {
+        die("No se encontró el cliente solicitado.");
+    }
+
+    mysqli_stmt_close($stmt);
+
 }
 
-echo "Registros encontrados: " . mysqli_num_rows($resultado);
-
-$cliente = mysqli_fetch_assoc($resultado);
-
-var_dump($cliente);
-
+mysqli_close($conn);
 
 ?>
-
 
 <!DOCTYPE html>
 <html lang="es">
@@ -54,41 +150,41 @@ var_dump($cliente);
 
     <h1>Editar información del cliente</h1>
 
+    <form action="editar.php?id=<?php echo $id; ?>" method="POST">
 
+        <input type="hidden" name="Id" value="<?php echo $id; ?>">
 
-    <form action="crear.php" method="POST">
+        <label>Nombre:</label>
+        <input type="text" name="Nombre" value="<?php echo htmlspecialchars($cliente['Nombre']); ?>" required>
 
-    <label>Nombre:</label>
-    <input type="text" name="Nombre" required>
+        <br><br>
 
-    <br><br>
+        <label>Apellido:</label>
+        <input type="text" name="Apellido" value="<?php echo htmlspecialchars($cliente['Apellido']); ?>" required>
 
-    <label>Apellido:</label>
-    <input type="text" name="Apellido" required>
+        <br><br>
 
-    <br><br>
+        <label>Correo:</label>
+        <input type="email" name="Correo" value="<?php echo htmlspecialchars($cliente['Correo']); ?>" required>
 
-    <label>Correo:</label>
-    <input type="email" name="Correo" required>
+        <br><br>
 
-    <br><br>
+        <label>Teléfono:</label>
+        <input type="text" name="Telefono" value="<?php echo htmlspecialchars($cliente['Telefono']); ?>">
 
-    <label>Telefono:</label>
-    <input type="text" name="Telefono">
+        <br><br>
 
-    <br><br>
+        <label>Dirección:</label>
+        <input type="text" name="Direccion" value="<?php echo htmlspecialchars($cliente['Direccion']); ?>">
 
-    <label>Direccion:</label>
-    <input type="text" name="Direccion">
+        <br><br>
 
-    <br><br>
+        <label>Ciudad:</label>
+        <input type="text" name="Ciudad" value="<?php echo htmlspecialchars($cliente['Ciudad']); ?>">
 
-    <label>Ciudad:</label>
-    <input type="text" name="Ciudad">
+        <br><br>
 
-    <br><br>
-
-    <button type="submit">Editar Cliente</button>
+        <button type="submit">Actualizar cliente</button>
 
     </form>
 
