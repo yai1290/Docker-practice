@@ -77,6 +77,11 @@ $resultado = mysqli_query($conn, $sql);
                 <a href="editar.php?id=<?php echo $cliente['Id']; ?>">
                     Editar
                 </a>
+
+                 <a href="eliminar.php?id=<?php echo $cliente['Id']; ?>">
+                    eliminar
+                </a>
+
             </td>
 
 
