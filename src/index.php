@@ -1,4 +1,18 @@
 <?php
+
+session_start();
+
+$mensaje = "";
+
+if (isset($_SESSION['mensaje'])) {
+
+    $mensaje = $_SESSION['mensaje'];
+
+    unset($_SESSION['mensaje']);
+
+}
+
+
 $servidor = "db";
 $usuario = "root";
 $contrasena = "ROOT";
@@ -17,13 +31,6 @@ $sql = "SELECT * FROM clientes";
 $resultado = mysqli_query($conn, $sql);
 
 
-
-// while ($cliente) {
-//     echo $cliente['nombre'] . " - ";
-//     echo $cliente['correo'] . "<br>";
-// }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -37,8 +44,15 @@ $resultado = mysqli_query($conn, $sql);
 <body>
 
 
-
     <h1>Listado de clientes</h1>
+
+    <?php if (!empty($mensaje)) { ?>
+
+    <div class="mensaje">
+        <?php echo htmlspecialchars($mensaje); ?>
+    </div>
+
+<?php } ?>
 
     <p>Total de clientes:
         <?php echo mysqli_num_rows($resultado); ?>
@@ -78,8 +92,10 @@ $resultado = mysqli_query($conn, $sql);
                     Editar
                 </a>
 
-                 <a href="eliminar.php?id=<?php echo $cliente['Id']; ?>">
-                    eliminar
+                 <a href="eliminar.php?id=<?php echo $cliente['Id']; ?>"
+                    onclick="return confirm('¿Estás seguro de que deseas eliminar este cliente?');"
+                    >
+                    Eliminar 
                 </a>
 
             </td>

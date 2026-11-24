@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 $servidor = "db";
 $usuario = "root";
 $contrasena = "ROOT";
@@ -45,7 +47,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
       if (mysqli_stmt_execute($stmt)) {
 
-        echo "Cliente registrado exitosamente.";
+        $_SESSION['mensaje'] = "Cliente registrado correctamente.";
+
+        mysqli_stmt_close($stmt);
+        mysqli_close($conn);
+
+    header("Location: index.php");
+    exit;
 
     } else {
 

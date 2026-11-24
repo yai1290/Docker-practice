@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 $servidor = "db";
 $usuario = "root";
 $contrasena = "ROOT";
@@ -13,40 +15,47 @@ if (!$conn) {
 
 mysqli_set_charset($conn, "utf8mb4");
 
-if (isset($_GET["id"]) || !is_numeric($_get["id"])){
-    die("ID de cliente no valido");
+$id = filter_input(INPUT_GET, "id", FILTER_VALIDATE_INT);
+
+if ($id === false || $id === null || $id <= 0) {
+    die("ID de cliente no válido.");
 }
 
-$id= (int) $_GET["id"]; 
-
 $sql = "DELETE FROM clientes
-WHERE Id = 5";
+WHERE Id = ?";
 
 $stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "i", $id); 
-    
+if (!$stmt) {
+    die("Error al preparar la consulta: " . mysqli_error($conn));
+}
+
+mysqli_stmt_bind_param($stmt, "i", $id);    
 if (mysqli_stmt_execute($stmt)) {
 
     if (mysqli_stmt_affected_rows($stmt) > 0) {
 
-        mysqli_stmt_close($stmt);
-        mysqli_close($conn);
-
-    header("Location: index.php");
-    exit;
+    $mensaje = "Cliente eliminado correctamente. ";
+    $eliminado = true;
 
     } else {
 
-        echo "No se encontró ningún cliente con ese ID.";
-
+        $mensaje = "No se encontró ningún cliente con ese ID.";
+        $eliminado = false;
     }
 
 } else {
 
-    echo "Error al eliminar: " . mysqli_stmt_error($stmt);
+    $mensaje =  "Error al eliminar: " . mysqli_stmt_error($stmt);
 
 }
 
+mysqli_stmt_close($stmt);
+mysqli_close($conn);
+
+$_SESSION["mensaje"] = $mensaje;
+
+header("Location: index.php");
+exit;
 
 
 
