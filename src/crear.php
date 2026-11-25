@@ -4,20 +4,9 @@ session_start();
 
 // 1. Conexión a la base de datos
 
-$servidor = "db";
-$usuario = "root";
-$contrasena = "ROOT";
-$base_datos = "docker_practice";
+require_once __DIR__ . '/config/conexion.php';
 
-$conn = mysqli_connect($servidor, $usuario, $contrasena, $base_datos);
-
-if (!$conn) {
-    die("Error de conexión: " . mysqli_connect_error());
-}
-
-mysqli_set_charset($conn, "utf8mb4");
-
-// 2. Comprobar el método de envío
+// 2. Comprobar método de envío
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -100,56 +89,161 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 mysqli_close($conn);
 
+// 10. Configurar título y cargar encabezado
+
+$titulo_pagina = "Registrar cliente";
+
+require_once __DIR__ . '/includes/header.php';
+
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
+<div class="container py-5 contenedor-principal">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Registrar clientes</title>
-</head>
+    <!-- Encabezado -->
 
-<body>
+    <div class="encabezado mb-4">
 
-    <h1>Registrar Clientes</h1>
+        <h1>Registrar cliente</h1>
 
-    <form action="crear.php" method="POST">
+        <p>Completa los siguientes datos para agregar un nuevo cliente.</p>
 
-        <label>Nombre:</label>
-        <input type="text" name="Nombre" required>
+    </div>
 
-        <br><br>
+    <!-- Formulario -->
 
-        <label>Apellido:</label>
-        <input type="text" name="Apellido" required>
+    <div class="card border-0 shadow-sm formulario-cliente">
 
-        <br><br>
+        <div class="card-body p-4">
 
-        <label>Correo:</label>
-        <input type="email" name="Correo" required>
+            <form action="crear.php" method="POST">
 
-        <br><br>
+                <div class="row g-3">
 
-        <label>Teléfono:</label>
-        <input type="text" name="Telefono">
+                    <div class="col-md-6">
 
-        <br><br>
+                        <label for="Nombre" class="form-label">
+                            Nombre
+                        </label>
 
-        <label>Dirección:</label>
-        <input type="text" name="Direccion">
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="Nombre"
+                            name="Nombre"
+                            placeholder="Ej. Juan"
+                            required
+                        >
 
-        <br><br>
+                    </div>
 
-        <label>Ciudad:</label>
-        <input type="text" name="Ciudad">
+                    <div class="col-md-6">
 
-        <br><br>
+                        <label for="Apellido" class="form-label">
+                            Apellido
+                        </label>
 
-        <button type="submit">Registrar</button>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="Apellido"
+                            name="Apellido"
+                            placeholder="Ej. Pérez"
+                            required
+                        >
 
-    </form>
+                    </div>
 
-</body>
+                    <div class="col-md-6">
 
-</html>
+                        <label for="Correo" class="form-label">
+                            Correo electrónico
+                        </label>
+
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="Correo"
+                            name="Correo"
+                            placeholder="ejemplo@correo.com"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label for="Telefono" class="form-label">
+                            Teléfono
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="Telefono"
+                            name="Telefono"
+                            placeholder="Ej. 809-000-0000"
+                        >
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label for="Direccion" class="form-label">
+                            Dirección
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="Direccion"
+                            name="Direccion"
+                            placeholder="Calle y número"
+                        >
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label for="Ciudad" class="form-label">
+                            Ciudad
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="Ciudad"
+                            name="Ciudad"
+                            placeholder="Ej. Bonao"
+                        >
+
+                    </div>
+
+                </div>
+
+                <!-- Botones -->
+
+                <div class="d-flex gap-2 justify-content-end mt-4">
+
+                    <a href="index.php" class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Registrar cliente
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<?php
+
+require_once __DIR__ . '/includes/footer.php';
+
+?>

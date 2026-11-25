@@ -1,116 +1,208 @@
+
 <?php
 
 session_start();
 
-$mensaje = "";
+// 1. Conexión a la base de datos
 
-if (isset($_SESSION['mensaje'])) {
+require_once __DIR__ . '/config/conexion.php';
 
-    $mensaje = $_SESSION['mensaje'];
+// 2. Recuperar notificación
 
-    unset($_SESSION['mensaje']);
+$mensaje = $_SESSION['mensaje'] ?? '';
 
-}
+unset($_SESSION['mensaje']);
 
+// 3. Consultar clientes
 
-$servidor = "db";
-$usuario = "root";
-$contrasena = "ROOT";
-$base_datos = "docker_practice";
-
-$conn = mysqli_connect($servidor, $usuario, $contrasena, $base_datos);
-
-if (!$conn) {
-    die("Error de conexión: " . mysqli_connect_error());
-}
-
-echo "Conexión exitosa a MySQL";
-
-$sql = "SELECT * FROM clientes";
+$sql = "SELECT * FROM clientes ORDER BY Id DESC";
 
 $resultado = mysqli_query($conn, $sql);
 
+if (!$resultado) {
+    die("Error al consultar clientes: " . mysqli_error($conn));
+}
+
+// 4. Calcular total de clientes
+
+$total_clientes = mysqli_num_rows($resultado);
+
+// 5. Configurar título y cargar encabezado
+
+$titulo_pagina = "Gestión de Clientes";
+
+require_once __DIR__ . '/includes/header.php';
 
 ?>
 
-<!DOCTYPE html>
-<html lang="es">
+<div class="container py-5 contenedor-principal">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Listado de clientes</title>
-</head>
+    <!-- Encabezado -->
 
-<body>
+    <div class="encabezado d-flex justify-content-between align-items-center flex-wrap gap-3">
 
+        <div>
 
-    <h1>Listado de clientes</h1>
+            <h1>Gestión de Clientes</h1>
 
-    <?php if (!empty($mensaje)) { ?>
+            <p>Administra la información de tus clientes.</p>
 
-    <div class="mensaje">
-        <?php echo htmlspecialchars($mensaje); ?>
+        </div>
+
+        <a href="crear.php" class="btn btn-primary">
+            Registrar cliente
+        </a>
+
     </div>
 
-<?php } ?>
+    <!-- Notificación -->
 
-    <p>Total de clientes:
-        <?php echo mysqli_num_rows($resultado); ?>
-    </p>
+    <?php if ($mensaje !== ''): ?>
 
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
 
-    <table border="1" cellpadding="10">
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>Correo</th>
-            <th>Teléfono</th>
-            <th>Dirección</th>
-            <th>Ciudad</th>
-            <th>Acciones</th>
-        
-        </tr>
+            <?php echo htmlspecialchars($mensaje, ENT_QUOTES, 'UTF-8'); ?>
 
-        <?php
-        while ($cliente = mysqli_fetch_assoc($resultado)) {
-            ?>
+            <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Cerrar">
+            </button>
 
-            <tr>
+        </div>
 
+    <?php endif; ?>
 
-                <td><?php echo htmlspecialchars($cliente['Id'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars($cliente['Nombre'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars($cliente['Apellido'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars($cliente['Correo'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars($cliente['Telefono'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars($cliente['Direccion'] ?? ''); ?></td>
-                <td><?php echo htmlspecialchars($cliente['Ciudad'] ?? ''); ?></td>
-                
-            <td>
-                <a href="editar.php?id=<?php echo $cliente['Id']; ?>">
-                    Editar
-                </a>
+    <!-- Total de clientes -->
 
-                 <a href="eliminar.php?id=<?php echo $cliente['Id']; ?>"
-                    onclick="return confirm('¿Estás seguro de que deseas eliminar este cliente?');"
-                    >
-                    Eliminar 
-                </a>
+    <div class="tarjeta-estadistica">
 
-            </td>
+        <p class="titulo">Total de clientes</p>
 
+        <p class="cantidad">
+            <?php echo $total_clientes; ?>
+        </p>
 
-            </tr>
+    </div>
 
+    <!-- Tabla de clientes -->
 
-        <?php } ?>
-    </table>
+    <div class="contenedor-tabla">
 
-</body>
+        <h2>Listado de clientes</h2>
 
-</html>
+        <div class="table-responsive">
+
+            <table class="table table-striped table-hover">
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Correo</th>
+                        <th>Teléfono</th>
+                        <th>Dirección</th>
+                        <th>Ciudad</th>
+                        <th>Acciones</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <?php if ($total_clientes > 0): ?>
+
+                        <?php while ($cliente = mysqli_fetch_assoc($resultado)): ?>
+
+                            <tr>
+
+                                <td>
+                                    <?php echo $cliente['Id']; ?>
+                                </td>
+
+                                <td>
+                                    <?php echo htmlspecialchars($cliente['Nombre'], ENT_QUOTES, 'UTF-8'); ?>
+                                </td>
+
+                                <td>
+                                    <?php echo htmlspecialchars($cliente['Apellido'], ENT_QUOTES, 'UTF-8'); ?>
+                                </td>
+
+                                <td>
+                                    <?php echo htmlspecialchars($cliente['Correo'], ENT_QUOTES, 'UTF-8'); ?>
+                                </td>
+
+                                <td>
+                                    <?php echo htmlspecialchars($cliente['Telefono'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
+                                </td>
+
+                                <td>
+                                    <?php echo htmlspecialchars($cliente['Direccion'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
+                                </td>
+
+                                <td>
+                                    <?php echo htmlspecialchars($cliente['Ciudad'] ?? '', ENT_QUOTES, 'UTF-8'); ?>
+                                </td>
+
+                                <td>
+
+                                    <div class="acciones">
+
+                                        <a
+                                            href="editar.php?id=<?php echo $cliente['Id']; ?>"
+                                            class="btn btn-sm btn-outline-primary">
+                                            Editar
+                                        </a>
+
+                                        <a
+                                            href="eliminar.php?id=<?php echo $cliente['Id']; ?>"
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('¿Estás seguro de eliminar este cliente?')">
+                                            Eliminar
+                                        </a>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        <?php endwhile; ?>
+
+                    <?php else: ?>
+
+                        <tr>
+
+                            <td colspan="8" class="text-center py-4">
+                                No hay clientes registrados.
+                            </td>
+
+                        </tr>
+
+                    <?php endif; ?>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
 
 <?php
+
+// 6. Cerrar conexión
+
+mysqli_free_result($resultado);
 mysqli_close($conn);
+
+// 7. Cargar pie de página
+
+require_once __DIR__ . '/includes/footer.php';
+
 ?>

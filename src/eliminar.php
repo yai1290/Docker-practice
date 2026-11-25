@@ -1,19 +1,13 @@
+
 <?php
 
 session_start();
 
-$servidor = "db";
-$usuario = "root";
-$contrasena = "ROOT";
-$base_datos = "docker_practice";
+// 1. Conexión a la base de datos
 
-$conn = mysqli_connect($servidor, $usuario, $contrasena, $base_datos);
+require_once __DIR__ . '/config/conexion.php';
 
-if (!$conn) {
-    die("Error de conexión: " . mysqli_connect_error());
-}
-
-mysqli_set_charset($conn, "utf8mb4");
+// 2. Validar el ID recibido por GET
 
 $id = filter_input(INPUT_GET, "id", FILTER_VALIDATE_INT);
 
@@ -21,43 +15,52 @@ if ($id === false || $id === null || $id <= 0) {
     die("ID de cliente no válido.");
 }
 
-$sql = "DELETE FROM clientes
-WHERE Id = ?";
+// 3. Preparar consulta DELETE
+
+$sql = "DELETE FROM clientes WHERE Id = ?";
 
 $stmt = mysqli_prepare($conn, $sql);
+
 if (!$stmt) {
     die("Error al preparar la consulta: " . mysqli_error($conn));
 }
 
-mysqli_stmt_bind_param($stmt, "i", $id);    
+// 4. Asociar el ID
+
+mysqli_stmt_bind_param($stmt, "i", $id);
+
+// 5. Ejecutar eliminación
+
 if (mysqli_stmt_execute($stmt)) {
 
     if (mysqli_stmt_affected_rows($stmt) > 0) {
 
-    $mensaje = "Cliente eliminado correctamente. ";
-    $eliminado = true;
+        $mensaje = "Cliente eliminado correctamente.";
 
     } else {
 
         $mensaje = "No se encontró ningún cliente con ese ID.";
-        $eliminado = false;
+
     }
 
 } else {
 
-    $mensaje =  "Error al eliminar: " . mysqli_stmt_error($stmt);
+    $mensaje = "Error al eliminar: " . mysqli_stmt_error($stmt);
 
 }
+
+// 6. Cerrar recursos
 
 mysqli_stmt_close($stmt);
 mysqli_close($conn);
 
+// 7. Guardar notificación
+
 $_SESSION["mensaje"] = $mensaje;
+
+// 8. Regresar al listado
 
 header("Location: index.php");
 exit;
 
-
-
 ?>
-
