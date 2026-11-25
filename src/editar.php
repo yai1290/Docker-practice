@@ -1,8 +1,10 @@
 <?php
 
-// ==========================================
-// 1. CONEXIÓN A LA BASE DE DATOS
-// ==========================================
+session_start();
+
+//* ==========================================*
+//* 1. CONEXIÓN A LA BASE DE DATOS
+//* ==========================================*
 
 $servidor = "db";
 $usuario = "root";
@@ -18,15 +20,15 @@ if (!$conn) {
 mysqli_set_charset($conn, "utf8mb4");
 
 
-// ==========================================
-// 2. IDENTIFICAR EL MÉTODO HTTP
-// ==========================================
+//* ==========================================*
+//* 2. IDENTIFICAR EL MÉTODO HTTP
+//* ==========================================*
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // ======================================
-    // 3. RECUPERAR LOS DATOS DEL FORMULARIO
-    // ======================================
+    //* ======================================*
+    //* 3. RECUPERAR LOS DATOS DEL FORMULARIO
+    //* ======================================*
 
     $id = $_POST['Id'];
 
@@ -38,9 +40,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $ciudad = $_POST['Ciudad'];
 
 
-    // ======================================
-    // 4. PREPARAR LA CONSULTA UPDATE
-    // ======================================
+    //* ======================================*
+    //* 4. PREPARAR LA CONSULTA UPDATE
+    //* ======================================*
 
     $sql = "UPDATE clientes
             SET Nombre = ?, Apellido = ?, Correo = ?,
@@ -54,9 +56,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
 
-    // ======================================
-    // 5. VINCULAR LOS DATOS
-    // ======================================
+    //* ======================================*
+    //* 5. VINCULAR LOS DATOS
+    //* ======================================*
 
     mysqli_stmt_bind_param(
         $stmt,
@@ -71,16 +73,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     );
 
 
-    // ======================================
-    // 6. EJECUTAR LA ACTUALIZACIÓN
-    // ======================================
+    //* ======================================*
+    //* 6. EJECUTAR LA ACTUALIZACIÓN
+    //* ======================================*
 
     if (mysqli_stmt_execute($stmt)) {
+
+        $_SESSION['mensaje'] = "Cliente actualizado correctamente.";
 
         mysqli_stmt_close($stmt);
         mysqli_close($conn);
 
-        header("Location: editar.php?id=" . $id);
+        header("Location: index.php");
         exit;
 
     } else {
@@ -89,14 +93,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     }
 
-    mysqli_stmt_close($stmt);
-
 
 } else {
 
-    // ======================================
-    // 7. RECUPERAR EL ID MEDIANTE GET
-    // ======================================
+    //* ======================================*
+    //* 7. RECUPERAR EL ID MEDIANTE GET
+    //* ======================================*
 
     if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
         die("ID de cliente no válido.");
@@ -105,13 +107,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $id = (int) $_GET['id'];
 
 
-    // ======================================
-    // 8. CONSULTAR EL CLIENTE
-    // ======================================
+    //* ======================================*
+    //* 8. CONSULTAR EL CLIENTE
+    //* ======================================*
 
     $sql = "SELECT * FROM clientes WHERE Id = ?";
 
     $stmt = mysqli_prepare($conn, $sql);
+
+    if (!$stmt) {
+        die("Error al preparar la consulta: " . mysqli_error($conn));
+    }
 
     mysqli_stmt_bind_param($stmt, "i", $id);
 
@@ -120,9 +126,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $resultado = mysqli_stmt_get_result($stmt);
 
 
-    // ======================================
-    // 9. RECUPERAR EL REGISTRO
-    // ======================================
+    //* ======================================*
+    //* 9. RECUPERAR EL REGISTRO
+    //* ======================================*
 
     $cliente = mysqli_fetch_assoc($resultado);
 
